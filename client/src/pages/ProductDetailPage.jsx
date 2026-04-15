@@ -3,8 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { fetchProductById } from '../store/slices/productSlice';
 import { addToCart } from '../store/slices/cartSlice';
+import { fetchWishlist, toggleWishlist } from '../store/slices/wishlistSlice';
 import Spinner from '../components/Spinner';
-import { FiChevronLeft, FiChevronRight, FiShoppingCart, FiZap } from 'react-icons/fi';
+import {
+  FiChevronLeft,
+  FiChevronRight,
+  FiShoppingCart,
+  FiZap,
+  FiHeart,
+} from 'react-icons/fi';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -13,6 +20,7 @@ export default function ProductDetailPage() {
 
   const { selectedProduct: product, loading, error } = useSelector((s) => s.products);
   const { error: cartError } = useSelector((s) => s.cart);
+  const { items: wishlistItems, toggleLoading } = useSelector((s) => s.wishlist);
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [adding, setAdding] = useState(false);
@@ -20,6 +28,7 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     dispatch(fetchProductById(id));
+    dispatch(fetchWishlist());
   }, [dispatch, id]);
 
   useEffect(() => {
@@ -48,6 +57,10 @@ export default function ProductDetailPage() {
     ? Math.round(Number(product.price) * (1 - Number(product.discount || 0) / 100))
     : 0;
 
+  const isWishlisted = product
+    ? wishlistItems.some((item) => Number(item.product_id) === Number(product.id))
+    : false;
+
   const nextImage = () => {
     setActiveImageIndex((prev) => (prev + 1) % images.length);
   };
@@ -75,6 +88,11 @@ export default function ProductDetailPage() {
     } finally {
       setBuying(false);
     }
+  };
+
+  const handleToggleWishlist = async () => {
+    if (!product) return;
+    await dispatch(toggleWishlist(product.id));
   };
 
   const renderSpecs = () => {
@@ -114,10 +132,8 @@ export default function ProductDetailPage() {
       <div className="max-w-7xl mx-auto px-3 sm:px-4">
         <div className="bg-white rounded-sm shadow-sm p-4 sm:p-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
-            {/* LEFT: IMAGE CAROUSEL */}
             <div>
               <div className="flex flex-col sm:flex-row gap-3">
-                {/* Thumbnails */}
                 <div className="order-2 sm:order-1 flex sm:flex-col gap-2 overflow-x-auto sm:overflow-visible">
                   {images.map((img, index) => (
                     <button
@@ -138,7 +154,6 @@ export default function ProductDetailPage() {
                   ))}
                 </div>
 
-                {/* Main image */}
                 <div className="order-1 sm:order-2 flex-1">
                   <div className="relative border border-gray-200 rounded-sm bg-white h-[320px] sm:h-[420px] md:h-[500px] flex items-center justify-center overflow-hidden">
                     <img
@@ -180,8 +195,7 @@ export default function ProductDetailPage() {
                     </div>
                   )}
 
-                  {/* Action buttons */}
-                  <div className="grid grid-cols-2 gap-3 mt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
                     <button
                       onClick={handleAddToCart}
                       disabled={adding || product.stock === 0}
@@ -199,6 +213,19 @@ export default function ProductDetailPage() {
                       <FiZap />
                       {buying ? 'PROCESSING...' : 'BUY NOW'}
                     </button>
+
+                    <button
+                      onClick={handleToggleWishlist}
+                      disabled={toggleLoading}
+                      className={`font-bold py-3 rounded-sm flex items-center justify-center gap-2 border transition-colors disabled:opacity-60 ${
+                        isWishlisted
+                          ? 'border-red-400 bg-red-50 text-red-500 hover:bg-red-100'
+                          : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <FiHeart className={isWishlisted ? 'fill-red-500' : ''} />
+                      {isWishlisted ? 'WISHLISTED' : 'WISHLIST'}
+                    </button>
                   </div>
 
                   {cartError && (
@@ -208,7 +235,6 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {/* RIGHT: PRODUCT DETAILS */}
             <div>
               <h1 className="text-xl sm:text-2xl font-medium text-gray-800 leading-snug">
                 {product.name}

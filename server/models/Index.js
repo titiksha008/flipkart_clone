@@ -86,9 +86,34 @@ Review.belongsTo(Product, {
   foreignKey: 'product_id',
   as: 'product',
 });
-User.hasMany(Wishlist, { foreignKey: 'user_id', as: 'wishlists' });
-Wishlist.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
-Product.hasMany(Wishlist, { foreignKey: 'product_id', as: 'wishlists' });
-Wishlist.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
 
-export { User, Product, Category, Order, OrderItem, CartItem, Review, Wishlist };
+// User ↔ Wishlist
+User.hasMany(Wishlist, {
+  foreignKey: 'user_id',
+  as: 'wishlists',
+});
+Wishlist.belongsTo(User, {
+  foreignKey: 'user_id',
+  as: 'user',
+});
+
+// Product ↔ Wishlist
+Product.hasMany(Wishlist, {
+  foreignKey: 'product_id',
+  as: 'wishlists',
+});
+Wishlist.belongsTo(Product, {
+  foreignKey: 'product_id',
+  as: 'product',
+});
+
+export {
+  User,
+  Product,
+  Category,
+  Order,
+  OrderItem,
+  CartItem,
+  Review,
+  Wishlist,
+};

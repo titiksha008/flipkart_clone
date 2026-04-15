@@ -23,19 +23,21 @@ export default function OrdersPage() {
         setLoading(true);
         setError('');
         const res = await api.get('/orders');
-        setOrders(Array.isArray(res.data.data) ? res.data.data : []);
+        setOrders(Array.isArray(res.data?.data) ? res.data.data : []);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to load orders');
       } finally {
         setLoading(false);
       }
     };
+
     loadOrders();
   }, []);
 
   const getImage = (item) => {
     const imgs = item?.product?.images;
     if (!imgs) return 'https://via.placeholder.com/100';
+
     try {
       const parsed = Array.isArray(imgs) ? imgs : JSON.parse(imgs);
       return parsed?.[0] || 'https://via.placeholder.com/100';
@@ -49,7 +51,9 @@ export default function OrdersPage() {
   return (
     <div className="bg-[#f1f3f6] min-h-screen py-3 sm:py-4">
       <div className="max-w-4xl mx-auto px-3 sm:px-4">
-        <h1 className="text-base sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4">My Orders</h1>
+        <h1 className="text-base sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4">
+          My Orders
+        </h1>
 
         {error && (
           <div className="bg-red-100 text-red-700 px-4 py-3 rounded-sm mb-4 text-sm">
@@ -78,37 +82,56 @@ export default function OrdersPage() {
                       Order #{order.id}
                     </span>
                     <span className="text-xs text-gray-400 ml-2 sm:ml-3">
-                      {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                        day: 'numeric', month: 'long', year: 'numeric',
-                      })}
+                      {order.createdAt
+                        ? new Date(order.createdAt).toLocaleDateString('en-IN', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                          })
+                        : ''}
                     </span>
                   </div>
-                  <span className={`text-xs font-bold px-2 py-1 rounded-full capitalize flex-shrink-0 ${STATUS_COLORS[order.status] || ''}`}>
+
+                  <span
+                    className={`text-xs font-bold px-2 py-1 rounded-full capitalize flex-shrink-0 ${
+                      STATUS_COLORS[order.status] || 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
                     {order.status}
                   </span>
                 </div>
 
                 <div className="space-y-2">
-                  {order.orderItems?.map((item) => (
-                    <div key={item.id} className="flex items-center gap-2 sm:gap-3">
-                      <img
-                        src={getImage(item)}
-                        alt={item.product?.name || 'Product'}
-                        className="w-12 h-12 sm:w-14 sm:h-14 object-contain border rounded flex-shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs sm:text-sm font-medium text-gray-800 line-clamp-1">
-                          {item.product?.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Qty: {item.quantity} × ₹{Number(item.price_at_purchase).toLocaleString()}
-                        </p>
+                  {Array.isArray(order.orderItems) && order.orderItems.length > 0 ? (
+                    order.orderItems.map((item) => (
+                      <div key={item.id} className="flex items-center gap-2 sm:gap-3">
+                        <img
+                          src={getImage(item)}
+                          alt={item.product?.name || 'Product'}
+                          className="w-12 h-12 sm:w-14 sm:h-14 object-contain border rounded flex-shrink-0"
+                        />
+
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs sm:text-sm font-medium text-gray-800 line-clamp-1">
+                            {item.product?.name || 'Unnamed Product'}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Qty: {Number(item.quantity)} × ₹
+                            {Number(item.price_at_purchase).toLocaleString('en-IN')}
+                          </p>
+                        </div>
+
+                        <span className="font-bold text-xs sm:text-sm flex-shrink-0">
+                          ₹
+                          {(
+                            Number(item.price_at_purchase) * Number(item.quantity)
+                          ).toLocaleString('en-IN')}
+                        </span>
                       </div>
-                      <span className="font-bold text-xs sm:text-sm flex-shrink-0">
-                        ₹{(Number(item.price_at_purchase) * Number(item.quantity)).toLocaleString()}
-                      </span>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500">No items found for this order.</p>
+                  )}
                 </div>
 
                 <div className="border-t mt-3 pt-3 flex items-center justify-between gap-2">
@@ -120,8 +143,9 @@ export default function OrdersPage() {
                       📍 {order.shipping_address}
                     </p>
                   </div>
+
                   <span className="font-bold text-sm sm:text-base flex-shrink-0">
-                    ₹{Number(order.total_price).toLocaleString()}
+                    ₹{Number(order.total_price).toLocaleString('en-IN')}
                   </span>
                 </div>
               </div>

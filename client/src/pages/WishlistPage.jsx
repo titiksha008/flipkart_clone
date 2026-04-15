@@ -10,15 +10,20 @@ import StarRating from '../components/StarRating';
 export default function WishlistPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { items, loading } = useSelector(s => s.wishlist);
+  const { items, loading } = useSelector((s) => s.wishlist);
 
-  useEffect(() => { dispatch(fetchWishlist()); }, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchWishlist());
+  }, [dispatch]);
 
-  const getPrice = (p) => Math.round(p.price * (1 - p.discount / 100));
+  const getPrice = (p) => Math.round(Number(p.price) * (1 - Number(p.discount || 0) / 100));
+
   const getImages = (p) => {
     try {
       return Array.isArray(p.images) ? p.images : JSON.parse(p.images || '[]');
-    } catch { return []; }
+    } catch {
+      return [];
+    }
   };
 
   if (loading) return <Spinner />;
@@ -27,7 +32,6 @@ export default function WishlistPage() {
     <div className="bg-[#f1f3f6] min-h-screen py-3 sm:py-4">
       <div className="max-w-5xl mx-auto px-3 sm:px-4">
         <div className="bg-white rounded-sm shadow-sm">
-          {/* Header */}
           <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 flex items-center justify-between">
             <h1 className="text-sm sm:text-base font-bold text-gray-800">
               My Wishlist{' '}
@@ -51,61 +55,70 @@ export default function WishlistPage() {
             </div>
           ) : (
             <div className="divide-y divide-gray-100">
-              {items.map(item => {
+              {items.map((item) => {
                 const p = item.product;
-                const imgs = getImages(p);
-                const price = getPrice(p);
-                const savings = Number(p.price) - price;
+                const imgs = getImages(p || {});
+                const price = p ? getPrice(p) : 0;
+                const savings = p ? Number(p.price) - price : 0;
+
                 return (
                   <div
                     key={item.id}
                     className="flex items-start gap-3 sm:gap-6 px-3 sm:px-6 py-4 sm:py-5 hover:bg-gray-50 transition-colors group"
                   >
-                    {/* Image */}
                     <div
                       className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 flex items-center justify-center cursor-pointer"
-                      onClick={() => navigate(`/products/${p.id}`)}
+                      onClick={() => navigate(`/products/${p?.id}`)}
                     >
                       <img
                         src={imgs[0] || 'https://via.placeholder.com/128'}
-                        alt={p.name}
+                        alt={p?.name}
                         className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform"
                       />
                     </div>
 
-                    {/* Details */}
                     <div className="flex-1 min-w-0">
                       <h3
-                        onClick={() => navigate(`/products/${p.id}`)}
+                        onClick={() => navigate(`/products/${p?.id}`)}
                         className="text-xs sm:text-sm font-medium text-gray-800 line-clamp-2 mb-1 sm:mb-2 cursor-pointer hover:text-[#2874f0]"
                       >
-                        {p.name}
+                        {p?.name}
                       </h3>
-                      <StarRating rating={p.rating} count={p.review_count} />
+
+                      <StarRating rating={p?.rating || 0} count={p?.review_count || 0} />
+
                       <div className="flex items-baseline gap-1 sm:gap-2 mt-1 sm:mt-2 flex-wrap">
                         <span className="text-base sm:text-xl font-bold text-gray-900">
-                          ₹{price.toLocaleString()}
+                          ₹{price.toLocaleString('en-IN')}
                         </span>
                         <span className="text-xs sm:text-sm text-gray-400 line-through">
-                          ₹{Number(p.price).toLocaleString()}
+                          ₹{Number(p?.price || 0).toLocaleString('en-IN')}
                         </span>
                         <span className="text-xs sm:text-sm text-green-600 font-bold">
-                          {p.discount}% off
+                          {p?.discount || 0}% off
                         </span>
                       </div>
+
                       {savings > 0 && (
                         <p className="text-xs text-green-600 mt-0.5">
-                          You save ₹{savings.toLocaleString()}
+                          You save ₹{savings.toLocaleString('en-IN')}
                         </p>
                       )}
-                      <p className={`text-xs mt-1 font-semibold ${p.stock > 0 ? 'text-green-600' : 'text-red-500'}`}>
-                        {p.stock > 0 ? '✓ In Stock' : '✗ Out of Stock'}
+
+                      <p
+                        className={`text-xs mt-1 font-semibold ${
+                          Number(p?.stock) > 0 ? 'text-green-600' : 'text-red-500'
+                        }`}
+                      >
+                        {Number(p?.stock) > 0 ? '✓ In Stock' : '✗ Out of Stock'}
                       </p>
 
-                      {/* Mobile action buttons inline */}
                       <div className="flex gap-2 mt-3 sm:hidden">
                         <button
-                          onClick={() => { dispatch(addToCart({ product_id: p.id, quantity: 1 })); navigate('/cart'); }}
+                          onClick={() => {
+                            dispatch(addToCart({ product_id: p.id, quantity: 1 }));
+                            navigate('/cart');
+                          }}
                           className="flex items-center gap-1 bg-[#ff9f00] hover:bg-[#f0960a] text-white px-3 py-2 text-xs font-bold rounded-sm transition-colors"
                         >
                           <FiShoppingCart className="text-xs" /> Cart
@@ -119,10 +132,12 @@ export default function WishlistPage() {
                       </div>
                     </div>
 
-                    {/* Desktop action buttons */}
                     <div className="hidden sm:flex flex-col gap-2 flex-shrink-0 pt-1">
                       <button
-                        onClick={() => { dispatch(addToCart({ product_id: p.id, quantity: 1 })); navigate('/cart'); }}
+                        onClick={() => {
+                          dispatch(addToCart({ product_id: p.id, quantity: 1 }));
+                          navigate('/cart');
+                        }}
                         className="flex items-center gap-2 bg-[#ff9f00] hover:bg-[#f0960a] text-white px-5 lg:px-6 py-2.5 text-sm font-bold rounded-sm transition-colors whitespace-nowrap"
                       >
                         <FiShoppingCart /> MOVE TO CART

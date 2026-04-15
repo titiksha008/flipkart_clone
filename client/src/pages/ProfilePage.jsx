@@ -92,7 +92,7 @@ export default function ProfilePage() {
     setOrdersLoading(true);
     try {
       const res = await api.get('/orders');
-      setOrders(Array.isArray(res.data.data) ? res.data.data : []);
+      setOrders(Array.isArray(res.data?.data) ? res.data.data : []);
     } catch {
       setOrders([]);
     } finally {
@@ -252,7 +252,7 @@ export default function ProfilePage() {
                         <button
                           onClick={() => {
                             setEditing(false);
-                            setForm({ name: user.name, phone: user.phone || '' });
+                            setForm({ name: user.name || '', phone: user.phone || '' });
                           }}
                           className="flex items-center gap-1 border border-gray-300 text-gray-600 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-semibold rounded-sm"
                         >
@@ -374,7 +374,7 @@ export default function ProfilePage() {
                             <p className="font-semibold text-gray-700 uppercase tracking-wide text-xs">
                               Total
                             </p>
-                            <p>₹{Number(order.total_price).toLocaleString()}</p>
+                            <p>₹{Number(order.total_price).toLocaleString('en-IN')}</p>
                           </div>
                           <div className="hidden sm:block">
                             <p className="font-semibold text-gray-700 uppercase tracking-wide text-xs">
@@ -417,15 +417,15 @@ export default function ProfilePage() {
                               </p>
                               <p className="text-xs text-gray-400 mt-0.5">
                                 Qty: {item.quantity} × ₹
-                                {Number(item.price_at_purchase).toLocaleString()}
+                                {Number(item.price_at_purchase).toLocaleString('en-IN')}
                               </p>
                             </div>
                             <div className="text-right flex-shrink-0">
                               <p className="font-bold text-xs sm:text-sm">
                                 ₹
                                 {(
-                                  Number(item.price_at_purchase) * item.quantity
-                                ).toLocaleString()}
+                                  Number(item.price_at_purchase) * Number(item.quantity)
+                                ).toLocaleString('en-IN')}
                               </p>
                               <button
                                 onClick={() => {
@@ -489,6 +489,7 @@ export default function ProfilePage() {
                       const p = item.product;
                       const img = getImage(p?.images);
                       const price = p ? getPrice(p) : 0;
+
                       return (
                         <div
                           key={item.id}
@@ -500,6 +501,7 @@ export default function ProfilePage() {
                             onClick={() => navigate(`/products/${p?.id}`)}
                             className="w-16 h-16 sm:w-20 sm:h-20 object-contain border border-gray-100 rounded cursor-pointer hover:border-blue-300 transition-colors flex-shrink-0"
                           />
+
                           <div className="flex-1 min-w-0">
                             <p
                               onClick={() => navigate(`/products/${p?.id}`)}
@@ -507,14 +509,15 @@ export default function ProfilePage() {
                             >
                               {p?.name}
                             </p>
+
                             <div className="flex items-baseline gap-1 sm:gap-2 flex-wrap">
                               <span className="font-bold text-gray-900 text-sm sm:text-base">
-                                ₹{price.toLocaleString()}
+                                ₹{price.toLocaleString('en-IN')}
                               </span>
-                              {p?.discount > 0 && (
+                              {Number(p?.discount || 0) > 0 && (
                                 <>
                                   <span className="text-xs text-gray-400 line-through">
-                                    ₹{Number(p?.price).toLocaleString()}
+                                    ₹{Number(p?.price).toLocaleString('en-IN')}
                                   </span>
                                   <span className="text-xs text-green-600 font-semibold">
                                     {p?.discount}% off
@@ -522,14 +525,16 @@ export default function ProfilePage() {
                                 </>
                               )}
                             </div>
+
                             <p
                               className={`text-xs mt-0.5 font-semibold ${
-                                p?.stock > 0 ? 'text-green-600' : 'text-red-500'
+                                Number(p?.stock) > 0 ? 'text-green-600' : 'text-red-500'
                               }`}
                             >
-                              {p?.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                              {Number(p?.stock) > 0 ? 'In Stock' : 'Out of Stock'}
                             </p>
                           </div>
+
                           <div className="flex flex-col gap-2 flex-shrink-0">
                             <button
                               onClick={() => {
@@ -632,9 +637,7 @@ export default function ProfilePage() {
                             </div>
                           </div>
                           <button
-                            onClick={() =>
-                              setAddresses(addresses.filter((_, j) => j !== i))
-                            }
+                            onClick={() => setAddresses(addresses.filter((_, j) => j !== i))}
                             className="text-xs text-red-400 hover:text-red-600 flex-shrink-0 ml-3"
                           >
                             Remove
