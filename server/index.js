@@ -20,6 +20,8 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:3000",
+  "https://flipkart-clone-eta-woad.vercel.app",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
@@ -31,16 +33,20 @@ app.use(
       if (!origin) {
         return callback(null, true);
       }
-
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-
+      console.log("CORS blocked for origin:", origin);
       return callback(new Error(`CORS blocked for origin: ${origin}`));
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
   })
 );
+
+// Handle preflight OPTIONS requests for all routes
+app.options("*", cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
