@@ -6,12 +6,15 @@ import {
   removeFromCart,
   clearCart,
 } from '../controllers/cartController.js';
+import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
+router.use(protect);
+
 router.get('/', getCart);
-router.post('/add', addToCart);
-router.put('/update/:id', updateCart);
+router.post('/', addToCart);
+router.put('/:id', updateCart);
 router.delete('/:id', removeFromCart);
 router.delete('/', clearCart);
 

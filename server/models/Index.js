@@ -5,6 +5,7 @@ import Order from './Order.js';
 import OrderItem from './OrderItem.js';
 import CartItem from './CartItem.js';
 import Review from './Review.js';
+import Wishlist from './Wishlist.js';
 
 // Category ↔ Product
 Category.hasMany(Product, {
@@ -85,5 +86,9 @@ Review.belongsTo(Product, {
   foreignKey: 'product_id',
   as: 'product',
 });
+User.hasMany(Wishlist, { foreignKey: 'user_id', as: 'wishlists' });
+Wishlist.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+Product.hasMany(Wishlist, { foreignKey: 'product_id', as: 'wishlists' });
+Wishlist.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
 
-export { User, Product, Category, Order, OrderItem, CartItem, Review };
+export { User, Product, Category, Order, OrderItem, CartItem, Review, Wishlist };

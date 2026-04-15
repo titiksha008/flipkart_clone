@@ -3,18 +3,24 @@ import { asyncHandler, AppError } from '../middleware/errorHandler.js';
 
 const DEFAULT_USER_ID = 1;
 
-export const getCart = asyncHandler(async (req, res) => {
+const getCurrentUserId = async () => {
   const user = await User.findByPk(DEFAULT_USER_ID);
 
   if (!user) {
     throw new AppError(
-      'Default user not found. Please seed the database so user id 1 exists.',
+      'Default user not found. Please run your seed file so user id 1 exists.',
       500
     );
   }
 
+  return DEFAULT_USER_ID;
+};
+
+export const getCart = asyncHandler(async (req, res) => {
+  const userId = await getCurrentUserId();
+
   const items = await CartItem.findAll({
-    where: { user_id: DEFAULT_USER_ID },
+    where: { user_id: userId },
     include: [
       {
         model: Product,
@@ -28,6 +34,7 @@ export const getCart = asyncHandler(async (req, res) => {
 });
 
 export const addToCart = asyncHandler(async (req, res) => {
+  const userId = await getCurrentUserId();
   const { product_id, quantity = 1 } = req.body;
 
   if (!product_id) {
@@ -45,14 +52,6 @@ export const addToCart = asyncHandler(async (req, res) => {
     throw new AppError('Quantity must be at least 1', 400);
   }
 
-  const user = await User.findByPk(DEFAULT_USER_ID);
-  if (!user) {
-    throw new AppError(
-      'Default user not found. Please run the seed file first so user id 1 exists.',
-      500
-    );
-  }
-
   const product = await Product.findByPk(parsedProductId);
   if (!product) {
     throw new AppError('Product not found', 404);
@@ -60,12 +59,12 @@ export const addToCart = asyncHandler(async (req, res) => {
 
   let item = await CartItem.findOne({
     where: {
-      user_id: DEFAULT_USER_ID,
+      user_id: userId,
       product_id: parsedProductId,
     },
   });
 
-  const existingQty = item ? item.quantity : 0;
+  const existingQty = item ? Number(item.quantity) : 0;
   const finalQty = existingQty + parsedQuantity;
 
   if (product.stock < finalQty) {
@@ -79,7 +78,7 @@ export const addToCart = asyncHandler(async (req, res) => {
     await item.save();
   } else {
     item = await CartItem.create({
-      user_id: DEFAULT_USER_ID,
+      user_id: userId,
       product_id: parsedProductId,
       quantity: parsedQuantity,
     });
@@ -102,6 +101,7 @@ export const addToCart = asyncHandler(async (req, res) => {
 });
 
 export const updateCart = asyncHandler(async (req, res) => {
+  const userId = await getCurrentUserId();
   const { quantity } = req.body;
   const parsedQuantity = Number(quantity);
 
@@ -112,7 +112,7 @@ export const updateCart = asyncHandler(async (req, res) => {
   const item = await CartItem.findOne({
     where: {
       id: req.params.id,
-      user_id: DEFAULT_USER_ID,
+      user_id: userId,
     },
   });
 
@@ -145,10 +145,12 @@ export const updateCart = asyncHandler(async (req, res) => {
 });
 
 export const removeFromCart = asyncHandler(async (req, res) => {
+  const userId = await getCurrentUserId();
+
   const item = await CartItem.findOne({
     where: {
       id: req.params.id,
-      user_id: DEFAULT_USER_ID,
+      user_id: userId,
     },
   });
 
@@ -162,8 +164,10 @@ export const removeFromCart = asyncHandler(async (req, res) => {
 });
 
 export const clearCart = asyncHandler(async (req, res) => {
+  const userId = await getCurrentUserId();
+
   await CartItem.destroy({
-    where: { user_id: DEFAULT_USER_ID },
+    where: { user_id: userId },
   });
 
   res.json({ success: true, message: 'Cart cleared' });

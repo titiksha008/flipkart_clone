@@ -14,14 +14,14 @@ const Order = sequelize.define('Order', {
     type: DataTypes.ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled'),
     defaultValue: 'pending',
   },
- payment_method: {
-  type: DataTypes.ENUM('COD', 'UPI', 'CARD'),  // uppercase
-  defaultValue: 'COD',
-},
-payment_status: {
-  type: DataTypes.ENUM('pending', 'paid'),       // fix this too
-  defaultValue: 'pending',
-},
+  payment_method: {
+    type: DataTypes.ENUM('COD', 'UPI', 'CARD'),
+    defaultValue: 'COD',
+  },
+  payment_status: {
+    type: DataTypes.ENUM('pending', 'paid'),
+    defaultValue: 'pending',
+  },
 });
 
 export default Order;

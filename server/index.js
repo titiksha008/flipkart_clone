@@ -10,6 +10,9 @@ import productRoutes from './routes/productRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import { protect } from './middleware/auth.js';
+import wishlistRoutes from './routes/wishlistRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
@@ -28,6 +31,10 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/cart', protect, cartRoutes);  
+app.use('/api/orders', protect, orderRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 app.use(errorHandler);
 

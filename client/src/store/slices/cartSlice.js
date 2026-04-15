@@ -1,54 +1,71 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../api/axios';
 
-export const fetchCart = createAsyncThunk('cart/fetch', async (_, thunkAPI) => {
-  try {
-    const res = await api.get('/cart');
-    return res.data.data;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(
-      error.response?.data?.message || 'Failed to fetch cart'
-    );
+export const fetchCart = createAsyncThunk(
+  'cart/fetchCart',
+  async (_, thunkAPI) => {
+    try {
+      const res = await api.get('/cart');
+      return res.data.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.message || 'Failed to fetch cart'
+      );
+    }
   }
-});
+);
 
 export const addToCart = createAsyncThunk(
-  'cart/add',
-  async ({ product_id, quantity = 1 }, thunkAPI) => {
+  'cart/addToCart',
+  async (payload, thunkAPI) => {
     try {
-      const res = await api.post('/cart/add', { product_id, quantity });
+      const res = await api.post('/cart', payload);
       return res.data.data;
-    } catch (error) {
+    } catch (err) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || 'Failed to add item to cart'
+        err.response?.data?.message || 'Failed to add to cart'
       );
     }
   }
 );
 
 export const updateCartItem = createAsyncThunk(
-  'cart/update',
+  'cart/updateCartItem',
   async ({ id, quantity }, thunkAPI) => {
     try {
-      const res = await api.put(`/cart/update/${id}`, { quantity });
+      const res = await api.put(`/cart/${id}`, { quantity });
       return res.data.data;
-    } catch (error) {
+    } catch (err) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || 'Failed to update cart item'
+        err.response?.data?.message || 'Failed to update cart item'
       );
     }
   }
 );
 
 export const removeFromCart = createAsyncThunk(
-  'cart/remove',
+  'cart/removeFromCart',
   async (id, thunkAPI) => {
     try {
       await api.delete(`/cart/${id}`);
       return id;
-    } catch (error) {
+    } catch (err) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || 'Failed to remove item from cart'
+        err.response?.data?.message || 'Failed to remove cart item'
+      );
+    }
+  }
+);
+
+export const clearCart = createAsyncThunk(
+  'cart/clearCart',
+  async (_, thunkAPI) => {
+    try {
+      await api.delete('/cart');
+      return true;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.message || 'Failed to clear cart'
       );
     }
   }
@@ -61,10 +78,13 @@ const cartSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    clearCartError: (state) => {
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
-      // fetch cart
       .addCase(fetchCart.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -75,48 +95,54 @@ const cartSlice = createSlice({
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Failed to fetch cart';
+        state.error = action.payload;
       })
 
-      // add to cart
       .addCase(addToCart.pending, (state) => {
         state.error = null;
       })
       .addCase(addToCart.fulfilled, (state, action) => {
         const newItem = action.payload;
-        const existingIndex = state.items.findIndex((i) => i.id === newItem.id);
+        const existingIndex = state.items.findIndex(
+          (item) => item.id === newItem.id
+        );
 
         if (existingIndex !== -1) {
           state.items[existingIndex] = newItem;
         } else {
-          state.items.push(newItem);
+          state.items.unshift(newItem);
         }
       })
       .addCase(addToCart.rejected, (state, action) => {
-        state.error = action.payload || 'Failed to add item to cart';
+        state.error = action.payload;
       })
 
-      // update cart item
       .addCase(updateCartItem.fulfilled, (state, action) => {
         const updatedItem = action.payload;
-        const index = state.items.findIndex((i) => i.id === updatedItem.id);
-
+        const index = state.items.findIndex((item) => item.id === updatedItem.id);
         if (index !== -1) {
           state.items[index] = updatedItem;
         }
       })
       .addCase(updateCartItem.rejected, (state, action) => {
-        state.error = action.payload || 'Failed to update cart item';
+        state.error = action.payload;
       })
 
-      // remove from cart
       .addCase(removeFromCart.fulfilled, (state, action) => {
-        state.items = state.items.filter((i) => i.id !== action.payload);
+        state.items = state.items.filter((item) => item.id !== action.payload);
       })
       .addCase(removeFromCart.rejected, (state, action) => {
-        state.error = action.payload || 'Failed to remove item from cart';
+        state.error = action.payload;
+      })
+
+      .addCase(clearCart.fulfilled, (state) => {
+        state.items = [];
+      })
+      .addCase(clearCart.rejected, (state, action) => {
+        state.error = action.payload;
       });
   },
 });
 
+export const { clearCartError } = cartSlice.actions;
 export default cartSlice.reducer;
