@@ -1,11 +1,26 @@
-function App() {
+import { Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import HomePage from './pages/HomePage';
+import ProductListPage from './pages/ProductListPage';
+import ProductDetailPage from './pages/ProductDetailPage';
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
+import OrderConfirmationPage from './pages/OrderConfirmationPage';
+import OrdersPage from './pages/OrdersPage';
+
+export default function App() {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <h1 className="text-2xl text-center pt-10 text-blue-600">
-        Flipkart Clone — Frontend Running!
-      </h1>
+    <div className="min-h-screen bg-[#f1f3f6]">
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/products" element={<ProductListPage />} />
+        <Route path="/products/:id" element={<ProductDetailPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/order-confirmation/:id" element={<OrderConfirmationPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
+      </Routes>
     </div>
   );
 }
-
-export default App;
