@@ -78,7 +78,7 @@ flipkart-clone/
 ### 1️⃣ Clone Repository
 
 ```bash
-git clone https://github.com/titiksha008/flipkart-clone.git
+git clone https://github.com/titiksha008/flipkart_clone.git
 cd flipkart-clone
 ````
 
