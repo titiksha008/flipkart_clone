@@ -7,6 +7,7 @@ import {
   User,
 } from '../models/index.js';
 import { asyncHandler, AppError } from '../middleware/errorHandler.js';
+import { sendOrderConfirmationEmail } from '../utils/emailService.js';
 
 const DEFAULT_USER_ID = 1;
 
@@ -16,7 +17,7 @@ const PAID_METHODS = ['UPI', 'CARD', 'NET_BANKING'];
 export const createOrder = asyncHandler(async (req, res) => {
   const { shipping_address, payment_method = 'COD' } = req.body;
 
-  // ── 1. Validate payment_method ───────────────────────────────────────────
+  // 1. Validate payment method
   const VALID_PAYMENT_METHODS = ['COD', 'UPI', 'CARD', 'NET_BANKING'];
   if (!VALID_PAYMENT_METHODS.includes(payment_method)) {
     throw new AppError(
@@ -25,7 +26,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     );
   }
 
-  // ── 2. Validate user exists ──────────────────────────────────────────────
+  // 2. Validate user exists
   const user = await User.findByPk(DEFAULT_USER_ID);
   if (!user) {
     throw new AppError(
@@ -34,12 +35,12 @@ export const createOrder = asyncHandler(async (req, res) => {
     );
   }
 
-  // ── 3. Validate shipping address ─────────────────────────────────────────
+  // 3. Validate shipping address
   if (!shipping_address || !shipping_address.trim()) {
     throw new AppError('Shipping address is required', 400);
   }
 
-  // ── 4. Fetch cart items ───────────────────────────────────────────────────
+  // 4. Fetch cart items
   const cartItems = await CartItem.findAll({
     where: { user_id: DEFAULT_USER_ID },
     include: [{ model: Product, as: 'product' }],
@@ -50,14 +51,16 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new AppError('Your cart is empty', 400);
   }
 
-  // ── 5. Pre-transaction stock validation ───────────────────────────────────
+  // 5. Pre-transaction stock validation
   const stockErrors = [];
   for (const item of cartItems) {
     const product = item.product;
+
     if (!product) {
       stockErrors.push(`Product with id ${item.product_id} no longer exists.`);
       continue;
     }
+
     if (product.stock < item.quantity) {
       stockErrors.push(
         `"${product.name}" — only ${product.stock} left in stock, but you requested ${item.quantity}.`
@@ -72,18 +75,16 @@ export const createOrder = asyncHandler(async (req, res) => {
     );
   }
 
-  // ── 6. Calculate total ───────────────────────────────────────────────────
+  // 6. Calculate total
   const totalPrice = cartItems.reduce((sum, item) => {
     return sum + Number(item.product.price) * Number(item.quantity);
   }, 0);
 
   const paymentStatus = PAID_METHODS.includes(payment_method) ? 'paid' : 'pending';
 
-  // ── 7. Transaction: lock rows → validate → decrement stock → create order ─
+  // 7. Transaction: lock rows → validate → decrement stock → create order
   const createdOrder = await sequelize.transaction(async (t) => {
-
     for (const item of cartItems) {
-      // Lock the row so concurrent orders can't race on the same stock
       const [rows] = await sequelize.query(
         `SELECT id, name, stock FROM Products WHERE id = ? FOR UPDATE`,
         {
@@ -109,9 +110,10 @@ export const createOrder = asyncHandler(async (req, res) => {
         );
       }
 
-      // Atomic decrement — WHERE stock >= ? prevents going negative
       const [result] = await sequelize.query(
-        `UPDATE Products SET stock = stock - ?, updatedAt = NOW() WHERE id = ? AND stock >= ?`,
+        `UPDATE Products
+         SET stock = stock - ?, updatedAt = NOW()
+         WHERE id = ? AND stock >= ?`,
         {
           replacements: [item.quantity, item.product_id, item.quantity],
           transaction: t,
@@ -160,7 +162,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     return order;
   });
 
-  // ── 8. Return full order ─────────────────────────────────────────────────
+  // 8. Fetch full order
   const fullOrder = await Order.findByPk(createdOrder.id, {
     include: [
       {
@@ -170,7 +172,28 @@ export const createOrder = asyncHandler(async (req, res) => {
       },
     ],
   });
+// 9. Send confirmation email
+try {
+  console.log('Order route hit');
+  console.log('User email from DB:', user.email);
+  console.log('About to send order confirmation email...');
 
+  if (user.email) {
+    const info = await sendOrderConfirmationEmail({
+      to: user.email,
+      name: user.name || 'Customer',
+      order: fullOrder,
+    });
+
+    console.log('Order confirmation email sent successfully');
+    console.log('Mail response:', info);
+  } else {
+    console.warn('User email not found. Skipping order confirmation email.');
+  }
+} catch (emailError) {
+  console.error('Failed to send order confirmation email:', emailError);
+}
+  // 10. Return response
   res.status(201).json({
     success: true,
     message: 'Order placed successfully',
@@ -180,6 +203,7 @@ export const createOrder = asyncHandler(async (req, res) => {
 
 export const getOrders = asyncHandler(async (req, res) => {
   const user = await User.findByPk(DEFAULT_USER_ID);
+
   if (!user) {
     throw new AppError(
       'Default user not found. Please seed the database so user id 1 exists.',
@@ -204,6 +228,7 @@ export const getOrders = asyncHandler(async (req, res) => {
 
 export const getOrderById = asyncHandler(async (req, res) => {
   const user = await User.findByPk(DEFAULT_USER_ID);
+
   if (!user) {
     throw new AppError(
       'Default user not found. Please seed the database so user id 1 exists.',

@@ -8,6 +8,14 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('Email transporter error:', error);
+  } else {
+    console.log('Email server is ready to send messages');
+  }
+});
+
 export const sendOrderConfirmationEmail = async ({ to, name, order }) => {
   const itemsHtml = order.orderItems
     .map(
@@ -67,10 +75,13 @@ export const sendOrderConfirmationEmail = async ({ to, name, order }) => {
     </div>
   `;
 
-  await transporter.sendMail({
+  const info = await transporter.sendMail({
     from: `"Flipkart Clone" <${process.env.EMAIL_USER}>`,
     to,
     subject: `Order Confirmed ✓ — Order #${order.id}`,
     html,
   });
+
+  console.log('Order email sent successfully:', info.response);
+  return info;
 };
