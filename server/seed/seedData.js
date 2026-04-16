@@ -5,413 +5,788 @@ import Category from '../models/Category.js';
 import Product from '../models/Product.js';
 import bcrypt from 'bcryptjs';
 
-/**
- * All image URLs use the Pexels CDN.
- * Format: https://images.pexels.com/photos/{ID}/pexels-photo-{ID}.jpeg?auto=compress&cs=tinysrgb&w=500
- *
- * Every photo ID below was sourced directly from a real Pexels search-result URL
- * and describes the exact subject listed in the comment.
- */
 const img = (id) =>
   `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=500`;
 
 const categories = [
+  { name: 'Grocery', slug: 'grocery' },
+  { name: 'Mobiles', slug: 'mobiles' },
+  { name: 'Fashion', slug: 'fashion' },
   { name: 'Electronics', slug: 'electronics' },
-  { name: 'Clothing', slug: 'clothing' },
-  { name: 'Books', slug: 'books' },
-  { name: 'Home & Kitchen', slug: 'home-kitchen' },
+  { name: 'Home & Furniture', slug: 'home-furniture' },
+  { name: 'Appliances', slug: 'appliances' },
+  { name: 'Travel', slug: 'travel' },
+  { name: 'Beauty', slug: 'beauty' },
+  { name: 'Toys', slug: 'toys' },
   { name: 'Sports', slug: 'sports' },
+  { name: 'Books', slug: 'books' },
 ];
 
 const products = [
-  // ─── ELECTRONICS ─────────────────────────────────────────────────────────────
-
+  // ─── GROCERY ────────────────────────────────────────────────────────────────
   {
-    name: 'Samsung Galaxy S24 Ultra',
-    description:
-      '6.8" Dynamic AMOLED 2X, 200MP Camera, S Pen included, Snapdragon 8 Gen 3',
-    price: 129999,
-    discount: 10,
-    stock: 50,
-    brand: 'Samsung',
-    images: [
-      img(544900),  // Turned-on Samsung Galaxy Android smartphone screen
-      img(5082578), // Person holding white Samsung Galaxy smartphone
-      img(404280),  // Black Android smartphone on marble surface, top view
-      img(1092644), // Smartphone screen glowing in the dark, close-up
-    ],
-    rating: 4.5,
-    review_count: 2341,
-    categorySlug: 'electronics',
+    name: 'Fortune Basmati Rice 5kg',
+    description: 'Premium long grain basmati rice with rich aroma and fluffy texture.',
+    price: 699,
+    discount: 18,
+    stock: 250,
+    brand: 'Fortune',
+    images: [img(4110251), img(6996050), img(6996053), img(4110004)],
+    rating: 4.3,
+    review_count: 5400,
+    categorySlug: 'grocery',
   },
-
   {
-    name: 'Apple iPhone 15 Pro',
-    description:
-      'A17 Pro chip, Titanium design, Pro camera system, USB-C, Action button',
-    price: 134900,
+    name: 'Aashirvaad Whole Wheat Atta 10kg',
+    description: 'Stone-ground whole wheat flour for soft rotis and healthy meals.',
+    price: 549,
+    discount: 12,
+    stock: 320,
+    brand: 'Aashirvaad',
+    images: [img(4198019), img(6996329), img(5824901), img(4110251)],
+    rating: 4.4,
+    review_count: 8200,
+    categorySlug: 'grocery',
+  },
+  {
+    name: 'Tata Salt 1kg Pack',
+    description: 'Vacuum evaporated iodised salt for daily cooking essentials.',
+    price: 28,
     discount: 5,
-    stock: 30,
-    brand: 'Apple',
-    images: [
-      img(19060954), // Close-up of an iPhone 15 Pro (triple camera module)
-      img(18525573), // iPhone 15 Pro Max, hand holding it against green leaves
-      img(19060160), // Person holding iPhone 15 Pro, rear camera visible
-      img(16168365), // iPhone in darkness, dual-camera lens on table edge
-    ],
-    rating: 4.7,
-    review_count: 5120,
-    categorySlug: 'electronics',
+    stock: 1000,
+    brand: 'Tata',
+    images: [img(4198796), img(4110004), img(4110251), img(6996050)],
+    rating: 4.5,
+    review_count: 12000,
+    categorySlug: 'grocery',
   },
-
   {
-    name: 'Sony WH-1000XM5 Headphones',
-    description:
-      'Industry-leading noise canceling, 30hr battery, multipoint connection, crystal clear calls',
-    price: 26990,
-    discount: 20,
-    stock: 100,
-    brand: 'Sony',
-    images: [
-      img(3394650), // Black over-ear wireless headphones on white background
-      img(7054538), // Over-ear headphones (product shot, Kindel Media)
-      img(1649771), // Black over-ear headphones lying on flat surface
-      img(577769),  // Over-ear headphones hanging on a wall hanger
-    ],
+    name: 'Amul Pure Ghee 1L',
+    description: 'Rich and aromatic pure ghee ideal for cooking and sweets.',
+    price: 699,
+    discount: 10,
+    stock: 220,
+    brand: 'Amul',
+    images: [img(5946721), img(6996053), img(4110251), img(5824901)],
     rating: 4.6,
-    review_count: 8932,
-    categorySlug: 'electronics',
+    review_count: 6350,
+    categorySlug: 'grocery',
   },
 
+  // ─── MOBILES ────────────────────────────────────────────────────────────────
+  {
+    name: 'Apple iPhone 15',
+    description: 'A16 Bionic chip, Dynamic Island, excellent camera and battery life.',
+    price: 79999,
+    discount: 7,
+    stock: 55,
+    brand: 'Apple',
+    images: [img(19060954), img(18525573), img(19060160), img(16168365)],
+    rating: 4.7,
+    review_count: 6200,
+    categorySlug: 'mobiles',
+  },
+  {
+    name: 'Samsung Galaxy S24',
+    description: 'Premium AMOLED display, flagship performance and pro-grade cameras.',
+    price: 74999,
+    discount: 10,
+    stock: 80,
+    brand: 'Samsung',
+    images: [img(544900), img(5082578), img(404280), img(1092644)],
+    rating: 4.5,
+    review_count: 4870,
+    categorySlug: 'mobiles',
+  },
+  {
+    name: 'OnePlus 12R',
+    description: 'Smooth display, fast charging, flagship-grade processor and premium design.',
+    price: 42999,
+    discount: 14,
+    stock: 110,
+    brand: 'OnePlus',
+    images: [img(607812), img(699122), img(1440727), img(5081926)],
+    rating: 4.4,
+    review_count: 3530,
+    categorySlug: 'mobiles',
+  },
+  {
+    name: 'Redmi Note 13 Pro',
+    description: 'High refresh rate display, strong cameras and excellent value for money.',
+    price: 25999,
+    discount: 16,
+    stock: 170,
+    brand: 'Redmi',
+    images: [img(699122), img(607812), img(5081926), img(404280)],
+    rating: 4.2,
+    review_count: 5910,
+    categorySlug: 'mobiles',
+  },
+
+  // ─── FASHION ────────────────────────────────────────────────────────────────
+  {
+    name: 'Levi’s Slim Fit Jeans',
+    description: 'Comfort stretch denim jeans with everyday slim fit styling.',
+    price: 2999,
+    discount: 30,
+    stock: 290,
+    brand: 'Levi’s',
+    images: [img(1598507), img(52518), img(4210784), img(1598505)],
+    rating: 4.2,
+    review_count: 12000,
+    categorySlug: 'fashion',
+  },
+  {
+    name: 'Nike Dri-FIT T-Shirt',
+    description: 'Breathable moisture-wicking t-shirt for training and casual wear.',
+    price: 1499,
+    discount: 25,
+    stock: 500,
+    brand: 'Nike',
+    images: [img(428340), img(769749), img(1232459), img(3622608)],
+    rating: 4.1,
+    review_count: 22100,
+    categorySlug: 'fashion',
+  },
+  {
+    name: 'H&M Oversized Hoodie',
+    description: 'Soft cotton blend hoodie with relaxed fit and kangaroo pocket.',
+    price: 2499,
+    discount: 35,
+    stock: 220,
+    brand: 'H&M',
+    images: [img(1183266), img(3622169), img(996329), img(1375849)],
+    rating: 4.0,
+    review_count: 3400,
+    categorySlug: 'fashion',
+  },
+  {
+    name: 'Puma Running Shoes',
+    description: 'Breathable sports shoes with cushioned sole and stylish design.',
+    price: 4299,
+    discount: 22,
+    stock: 160,
+    brand: 'Puma',
+    images: [img(2529148), img(1464230), img(1598508), img(1456706)],
+    rating: 4.3,
+    review_count: 6700,
+    categorySlug: 'fashion',
+  },
+  {
+    name: 'Adidas Track Pants',
+    description: 'Comfortable tapered track pants for workouts, travel, and everyday wear.',
+    price: 2199,
+    discount: 26,
+    stock: 300,
+    brand: 'Adidas',
+    images: [img(6311392), img(6311603), img(4210860), img(2529147)],
+    rating: 4.2,
+    review_count: 4820,
+    categorySlug: 'fashion',
+  },
+  {
+    name: 'Roadster Checked Casual Shirt',
+    description: 'Soft cotton checked shirt with regular fit, ideal for casual outings.',
+    price: 1299,
+    discount: 38,
+    stock: 410,
+    brand: 'Roadster',
+    images: [img(297933), img(428338), img(1040945), img(6311611)],
+    rating: 4.1,
+    review_count: 7310,
+    categorySlug: 'fashion',
+  },
+  {
+    name: 'Zara Women Midi Dress',
+    description: 'Elegant midi dress with soft flowy fabric and flattering silhouette.',
+    price: 3499,
+    discount: 18,
+    stock: 145,
+    brand: 'Zara',
+    images: [img(985635), img(1536619), img(774909), img(6311475)],
+    rating: 4.4,
+    review_count: 2610,
+    categorySlug: 'fashion',
+  },
+  {
+    name: 'US Polo Polo T-Shirt',
+    description: 'Classic polo t-shirt with breathable cotton and smart casual styling.',
+    price: 1799,
+    discount: 24,
+    stock: 390,
+    brand: 'US Polo',
+    images: [img(6311601), img(428340), img(769749), img(6311611)],
+    rating: 4.3,
+    review_count: 5525,
+    categorySlug: 'fashion',
+  },
+  {
+    name: 'Biba Printed Kurta',
+    description: 'Comfortable ethnic kurta with elegant print and straight fit design.',
+    price: 1899,
+    discount: 29,
+    stock: 265,
+    brand: 'Biba',
+    images: [img(6311656), img(6311393), img(1536619), img(774909)],
+    rating: 4.3,
+    review_count: 4095,
+    categorySlug: 'fashion',
+  },
+  {
+    name: 'Van Heusen Formal Trousers',
+    description: 'Slim fit formal trousers with wrinkle-resistant fabric and sharp office look.',
+    price: 2399,
+    discount: 31,
+    stock: 240,
+    brand: 'Van Heusen',
+    images: [img(6311398), img(1040945), img(6311603), img(2529147)],
+    rating: 4.2,
+    review_count: 3380,
+    categorySlug: 'fashion',
+  },
+
+  // ─── ELECTRONICS ────────────────────────────────────────────────────────────
   {
     name: 'Dell XPS 15 Laptop',
-    description:
-      '13th Gen Intel Core i7, 16GB RAM, 512GB SSD, 15.6" OLED Touch Display',
+    description: 'Powerful laptop with OLED display, premium build and fast SSD.',
     price: 189990,
     discount: 8,
     stock: 20,
     brand: 'Dell',
-    images: [
-      img(205421),  // Silver laptop open on wooden desk, side view
-      img(1229861), // Laptop open on desk showing bright screen
-      img(374074),  // Laptop keyboard and screen close-up, code on screen
-      img(1181675), // Person typing on a laptop keyboard, top-down view
-    ],
+    images: [img(205421), img(1229861), img(374074), img(1181675)],
     rating: 4.4,
     review_count: 1203,
     categorySlug: 'electronics',
   },
-
   {
-    name: 'OnePlus Buds Pro 2',
-    description:
-      'Spatial Audio, 39dB ANC, 36 hrs battery, LHDC codec support',
-    price: 9999,
-    discount: 15,
-    stock: 200,
-    brand: 'OnePlus',
-    images: [
-      img(3945683), // White wireless TWS earbuds in open charging case
-      img(3756673), // Wireless earbuds case closed on a table
-      img(4158427), // Earbuds resting outside their case, white surface
-      img(8534285), // Small TWS earbuds and case, minimal background
-    ],
-    rating: 4.3,
-    review_count: 4231,
+    name: 'Sony WH-1000XM5 Headphones',
+    description: 'Industry-leading noise cancellation with premium audio quality.',
+    price: 26990,
+    discount: 20,
+    stock: 100,
+    brand: 'Sony',
+    images: [img(3394650), img(7054538), img(1649771), img(577769)],
+    rating: 4.6,
+    review_count: 8932,
+    categorySlug: 'electronics',
+  },
+  {
+    name: 'Canon EOS 200D II DSLR',
+    description: 'Compact DSLR with 24.1MP sensor and superb autofocus performance.',
+    price: 57999,
+    discount: 12,
+    stock: 38,
+    brand: 'Canon',
+    images: [img(90946), img(51383), img(225157), img(573299)],
+    rating: 4.5,
+    review_count: 3890,
+    categorySlug: 'electronics',
+  },
+  {
+    name: 'boAt Airdopes 141',
+    description: 'TWS earbuds with long playback, low latency and compact case.',
+    price: 1499,
+    discount: 50,
+    stock: 420,
+    brand: 'boAt',
+    images: [img(8534089), img(8534277), img(3780681), img(3945667)],
+    rating: 4.1,
+    review_count: 18440,
     categorySlug: 'electronics',
   },
 
-  // ─── CLOTHING ─────────────────────────────────────────────────────────────────
-
+  // ─── HOME & FURNITURE ───────────────────────────────────────────────────────
   {
-    name: "Levi's 511 Slim Fit Jeans",
-    description:
-      'Classic slim fit, stretch denim, versatile everyday wear, multiple washes available',
-    price: 3999,
-    discount: 30,
-    stock: 500,
-    brand: "Levi's",
-    images: [
-      img(1598507), // Blue slim-fit jeans folded on white surface
-      img(52518),   // Stack of blue denim jeans on a wooden shelf in store
-      img(4210784), // Person wearing blue slim jeans, waist-down shot
-      img(1598505), // Close-up of denim jeans waistband and Levi's tag
-    ],
+    name: 'Wakefit Memory Foam Mattress',
+    description: 'Comfortable orthopedic mattress with premium support and breathable cover.',
+    price: 12999,
+    discount: 28,
+    stock: 90,
+    brand: 'Wakefit',
+    images: [img(6585750), img(271743), img(271618), img(6585761)],
+    rating: 4.4,
+    review_count: 5120,
+    categorySlug: 'home-furniture',
+  },
+  {
+    name: 'Ikea Study Table',
+    description: 'Minimal modern study desk with sturdy frame and clean finish.',
+    price: 4999,
+    discount: 19,
+    stock: 70,
+    brand: 'Ikea',
+    images: [img(271816), img(1112598), img(1643383), img(112811)],
     rating: 4.2,
-    review_count: 12000,
-    categorySlug: 'clothing',
+    review_count: 2340,
+    categorySlug: 'home-furniture',
   },
-
   {
-    name: 'Nike Dri-FIT T-Shirt',
-    description:
-      'Moisture-wicking fabric, lightweight, standard fit, ideal for workouts and casual wear',
-    price: 1499,
-    discount: 25,
-    stock: 1000,
-    brand: 'Nike',
-    images: [
-      img(428340),  // Plain white t-shirt flat lay on white background
-      img(769749),  // Black crew-neck t-shirt on a hanger, minimal
-      img(1232459), // Folded grey athletic t-shirt, product shot
-      img(3622608), // Athletic t-shirt close-up, fabric texture visible
-    ],
-    rating: 4.1,
-    review_count: 22100,
-    categorySlug: 'clothing',
-  },
-
-  {
-    name: "Puma Men's Running Shoes",
-    description:
-      'NITRO foam midsole, PUMAGRIP outsole, breathable mesh upper, ideal for long runs',
-    price: 7999,
-    discount: 20,
-    stock: 150,
-    brand: 'Puma',
-    images: [
-      img(2529148), // Red and black Puma running sneakers on white background
-      img(1464230), // Pair of sports running shoes, side-angle product shot
-      img(1598508), // Running shoes laced up on a track
-      img(1456706), // Athletic running shoes on outdoor surface, action angle
-    ],
+    name: 'Wooden 3-Seater Sofa',
+    description: 'Elegant living room sofa with plush cushioning and durable wooden frame.',
+    price: 21999,
+    discount: 24,
+    stock: 35,
+    brand: 'Home Centre',
+    images: [img(1866149), img(2762247), img(1571468), img(276583)],
     rating: 4.3,
-    review_count: 6700,
-    categorySlug: 'clothing',
+    review_count: 1680,
+    categorySlug: 'home-furniture',
   },
-
   {
-    name: 'H&M Oversized Hoodie',
-    description:
-      'Soft cotton blend, kangaroo pocket, relaxed fit, ribbed cuffs and hem',
-    price: 2499,
-    discount: 35,
-    stock: 300,
-    brand: 'H&M',
-    images: [
-      img(1183266), // Beige oversized hoodie flat lay on white background
-      img(3622169), // Grey hoodie hanging on wooden hanger
-      img(996329),  // Person wearing an oversized hoodie, front-facing
-      img(1375849), // Hoodie detail — kangaroo pocket and ribbed cuffs
-    ],
-    rating: 4.0,
-    review_count: 3400,
-    categorySlug: 'clothing',
-  },
-
-  // ─── BOOKS ────────────────────────────────────────────────────────────────────
-
-  {
-    name: 'Atomic Habits – James Clear',
-    description:
-      'Tiny Changes, Remarkable Results. A proven framework for building good habits and breaking bad ones.',
-    price: 499,
-    discount: 40,
-    stock: 2000,
-    brand: 'Penguin',
-    images: [
-      img(1130882), // Single hardcover book on a clean white surface
-      img(904620),  // Open book flat lay on wooden table, warm lighting
-      img(159711),  // Book with reading glasses placed on top
-      img(256431),  // Person reading a book, hands and pages close-up
-    ],
-    rating: 4.8,
-    review_count: 45000,
-    categorySlug: 'books',
-  },
-
-  {
-    name: 'The Psychology of Money',
-    description:
-      'Timeless lessons on wealth, greed, and happiness by Morgan Housel',
-    price: 399,
-    discount: 35,
-    stock: 1500,
-    brand: 'Jaico Publishing',
-    images: [
-      img(1148399), // Book with a cup of coffee on a wooden desk
-      img(762687),  // Close-up of open book pages being read
-      img(2908175), // Stack of hardcover books on table, top-down shot
-      img(694740),  // Books and a notepad on a study desk, lifestyle
-    ],
-    rating: 4.7,
-    review_count: 31000,
-    categorySlug: 'books',
-  },
-
-  {
-    name: 'Deep Work – Cal Newport',
-    description:
-      'Rules for focused success in a distracted world. Transform your productivity.',
-    price: 449,
-    discount: 30,
-    stock: 800,
-    brand: 'Hachette',
-    images: [
-      img(590493),  // Person reading a book at a desk, focused environment
-      img(256541),  // Books on a wooden library shelf, bokeh background
-      img(1181671), // Open book on a study table with highlighted text
-      img(2177482), // Minimalist shot — one book on a white bedsheet
-    ],
-    rating: 4.6,
-    review_count: 18000,
-    categorySlug: 'books',
-  },
-
-  {
-    name: 'Clean Code – Robert Martin',
-    description:
-      'A handbook of agile software craftsmanship. Essential reading for every developer.',
-    price: 699,
+    name: 'Decorative Table Lamp',
+    description: 'Warm ambient lighting with compact elegant bedside design.',
+    price: 1299,
     discount: 20,
-    stock: 500,
-    brand: 'Pearson',
-    images: [
-      img(574071),  // Row of books on a shelf, spines facing out
-      img(1907785), // Books on a wooden bookshelf in a library
-      img(3747164), // Thick hardcover tech/reference book on a desk
-      img(2943603), // Programmer-style books and laptop on a workspace
-    ],
-    rating: 4.5,
-    review_count: 9000,
-    categorySlug: 'books',
+    stock: 210,
+    brand: 'Philips',
+    images: [img(112811), img(271816), img(1643383), img(1112598)],
+    rating: 4.1,
+    review_count: 1920,
+    categorySlug: 'home-furniture',
+  },
+  {
+    name: 'Sleepyhead Office Chair',
+    description: 'Ergonomic office chair with lumbar support and adjustable height.',
+    price: 6999,
+    discount: 23,
+    stock: 85,
+    brand: 'Sleepyhead',
+    images: [img(1957478), img(586763), img(276583), img(1571468)],
+    rating: 4.3,
+    review_count: 2740,
+    categorySlug: 'home-furniture',
+  },
+  {
+    name: 'Nilkamal Plastic Storage Cabinet',
+    description: 'Compact multi-shelf storage cabinet for home utility and organisation.',
+    price: 4599,
+    discount: 21,
+    stock: 95,
+    brand: 'Nilkamal',
+    images: [img(5824883), img(4239032), img(1112598), img(271816)],
+    rating: 4.1,
+    review_count: 1835,
+    categorySlug: 'home-furniture',
+  },
+  {
+    name: 'Urban Ladder Coffee Table',
+    description: 'Stylish center table with solid wood look and minimalist finish.',
+    price: 5499,
+    discount: 17,
+    stock: 60,
+    brand: 'Urban Ladder',
+    images: [img(2762247), img(1866149), img(276583), img(1571468)],
+    rating: 4.2,
+    review_count: 1490,
+    categorySlug: 'home-furniture',
+  },
+  {
+    name: 'Allen Solly Door Curtains Set',
+    description: 'Elegant curtains with soft fabric and modern patterned finish.',
+    price: 1799,
+    discount: 28,
+    stock: 180,
+    brand: 'Allen Solly',
+    images: [img(271743), img(6585750), img(271618), img(1112598)],
+    rating: 4.0,
+    review_count: 2260,
+    categorySlug: 'home-furniture',
+  },
+  {
+    name: 'King Size Bedsheet Set',
+    description: 'Soft cotton bedsheet set with pillow covers and premium print.',
+    price: 1399,
+    discount: 32,
+    stock: 250,
+    brand: 'Spaces',
+    images: [img(6585761), img(6585750), img(271743), img(271618)],
+    rating: 4.2,
+    review_count: 3580,
+    categorySlug: 'home-furniture',
+  },
+  {
+    name: 'Wooden Bookshelf Organizer',
+    description: 'Multi-tier bookshelf for living room, study, or bedroom storage.',
+    price: 6299,
+    discount: 20,
+    stock: 48,
+    brand: 'HomeTown',
+    images: [img(1907785), img(574071), img(271816), img(1643383)],
+    rating: 4.3,
+    review_count: 1315,
+    categorySlug: 'home-furniture',
   },
 
-  // ─── HOME & KITCHEN ───────────────────────────────────────────────────────────
-
+  // ─── APPLIANCES ─────────────────────────────────────────────────────────────
   {
-    name: 'Instant Pot Duo 7-in-1',
-    description:
-      'Pressure cooker, slow cooker, rice cooker, steamer, sauté pan, yogurt maker, food warmer',
-    price: 8999,
-    discount: 25,
-    stock: 200,
-    brand: 'Instant Pot',
-    images: [
-      img(3184183), // Stainless-steel electric pressure cooker on countertop
-      img(4109743), // Electric multicooker in a modern kitchen setting
-      img(2544829), // Close-up of pressure cooker with steam rising
-      img(3622338), // Instant pot lid and body, product detail shot
-    ],
-    rating: 4.6,
-    review_count: 15000,
-    categorySlug: 'home-kitchen',
-  },
-
-  {
-    name: 'Dyson V12 Detect Slim',
-    description:
-      'Laser detects invisible dust, HEPA filtration, 60 min runtime, LCD display',
-    price: 54900,
-    discount: 10,
-    stock: 40,
-    brand: 'Dyson',
-    images: [
-      img(4108726), // Person using cordless stick vacuum on hardwood floor
-      img(6195122), // Cordless vacuum cleaner leaning against a white wall
-      img(4239891), // Vacuum cleaner on carpet in a bright living room
-      img(4108734), // Cordless vacuum, close-up of head and suction nozzle
-    ],
-    rating: 4.7,
-    review_count: 4200,
-    categorySlug: 'home-kitchen',
-  },
-
-  {
-    name: 'Philips Air Fryer HD9200',
-    description:
-      '4.1L capacity, Rapid Air technology, 13-in-1 presets, 90% less fat',
+    name: 'Philips Air Fryer',
+    description: 'Rapid air technology for healthier frying with less oil.',
     price: 7995,
     discount: 30,
     stock: 300,
     brand: 'Philips',
-    images: [
-      img(5765812), // Black air fryer on white kitchen countertop
-      img(4397293), // Air fryer basket open with fries inside
-      img(6605559), // Modern air fryer on clean minimalist countertop
-      img(6605374), // Air fryer dial and controls close-up detail
-    ],
+    images: [img(5765812), img(4397293), img(6605559), img(6605374)],
     rating: 4.4,
     review_count: 22000,
-    categorySlug: 'home-kitchen',
+    categorySlug: 'appliances',
+  },
+  {
+    name: 'Prestige Electric Kettle',
+    description: '1.5L electric kettle with auto cut-off and stainless steel body.',
+    price: 1499,
+    discount: 36,
+    stock: 420,
+    brand: 'Prestige',
+    images: [img(4108713), img(5824530), img(6605561), img(4109743)],
+    rating: 4.2,
+    review_count: 10440,
+    categorySlug: 'appliances',
+  },
+  {
+    name: 'LG Front Load Washing Machine',
+    description: 'Energy-efficient washing machine with smart inverter technology.',
+    price: 32999,
+    discount: 18,
+    stock: 44,
+    brand: 'LG',
+    images: [img(5591547), img(4108726), img(4239891), img(4108734)],
+    rating: 4.5,
+    review_count: 4180,
+    categorySlug: 'appliances',
+  },
+  {
+    name: 'Samsung Double Door Refrigerator',
+    description: 'Spacious refrigerator with inverter compressor and modern design.',
+    price: 38999,
+    discount: 16,
+    stock: 32,
+    brand: 'Samsung',
+    images: [img(5824546), img(5824897), img(4239031), img(4239032)],
+    rating: 4.4,
+    review_count: 3620,
+    categorySlug: 'appliances',
+  },
+  {
+    name: 'Bajaj Mixer Grinder',
+    description: 'Powerful kitchen mixer grinder with multiple jars and durable motor.',
+    price: 3299,
+    discount: 27,
+    stock: 210,
+    brand: 'Bajaj',
+    images: [img(4109743), img(5824530), img(6605561), img(5765812)],
+    rating: 4.2,
+    review_count: 6240,
+    categorySlug: 'appliances',
+  },
+  {
+    name: 'Morphy Richards Toaster',
+    description: '2-slice pop-up toaster with adjustable browning control.',
+    price: 2199,
+    discount: 22,
+    stock: 150,
+    brand: 'Morphy Richards',
+    images: [img(6605374), img(6605559), img(5824901), img(4108713)],
+    rating: 4.1,
+    review_count: 2315,
+    categorySlug: 'appliances',
+  },
+  {
+    name: 'Voltas Split AC 1.5 Ton',
+    description: 'Efficient split air conditioner with fast cooling and sleep mode.',
+    price: 36999,
+    discount: 20,
+    stock: 36,
+    brand: 'Voltas',
+    images: [img(5824883), img(4239031), img(4239032), img(5824897)],
+    rating: 4.3,
+    review_count: 2870,
+    categorySlug: 'appliances',
+  },
+  {
+    name: 'Eureka Forbes Vacuum Cleaner',
+    description: 'Compact vacuum cleaner for dust-free cleaning across rooms and corners.',
+    price: 5499,
+    discount: 25,
+    stock: 88,
+    brand: 'Eureka Forbes',
+    images: [img(4108726), img(6195122), img(4239891), img(4108734)],
+    rating: 4.2,
+    review_count: 2690,
+    categorySlug: 'appliances',
+  },
+  {
+    name: 'Butterfly Gas Stove 3 Burner',
+    description: 'Toughened glass top gas stove with brass burners and stable pan support.',
+    price: 4599,
+    discount: 19,
+    stock: 110,
+    brand: 'Butterfly',
+    images: [img(6996329), img(5824901), img(4195324), img(6664361)],
+    rating: 4.3,
+    review_count: 3125,
+    categorySlug: 'appliances',
+  },
+  {
+    name: 'Kent RO Water Purifier',
+    description: 'Multi-stage purification system with RO+UV+UF and mineral retention.',
+    price: 14999,
+    discount: 17,
+    stock: 72,
+    brand: 'Kent',
+    images: [img(4239031), img(5824519), img(4239032), img(5824897)],
+    rating: 4.4,
+    review_count: 5410,
+    categorySlug: 'appliances',
   },
 
-  // ─── SPORTS ───────────────────────────────────────────────────────────────────
-
+  // ─── TRAVEL ─────────────────────────────────────────────────────────────────
   {
-    name: 'Yonex Arcsaber 11 Pro Badminton Racket',
-    description:
-      'High repulsion frame, carbon fiber shaft, ideal for offensive players, 3U/G5',
-    price: 12999,
+    name: 'Safari Trolley Bag 65L',
+    description: 'Durable trolley suitcase with spinner wheels and spacious compartments.',
+    price: 3499,
+    discount: 27,
+    stock: 180,
+    brand: 'Safari',
+    images: [img(1152077), img(1008155), img(1545743), img(741209)],
+    rating: 4.2,
+    review_count: 4110,
+    categorySlug: 'travel',
+  },
+  {
+    name: 'Wildcraft Hiking Backpack',
+    description: 'Comfortable multi-pocket backpack for trekking and long travel.',
+    price: 2499,
+    discount: 20,
+    stock: 240,
+    brand: 'Wildcraft',
+    images: [img(1545743), img(2905238), img(1152077), img(741209)],
+    rating: 4.3,
+    review_count: 5205,
+    categorySlug: 'travel',
+  },
+  {
+    name: 'Travel Neck Pillow Set',
+    description: 'Soft neck pillow set with eye mask and carrying pouch.',
+    price: 799,
+    discount: 25,
+    stock: 300,
+    brand: 'AmazonBasics',
+    images: [img(6347547), img(741209), img(1008155), img(1545743)],
+    rating: 4.1,
+    review_count: 1870,
+    categorySlug: 'travel',
+  },
+  {
+    name: 'American Tourister Cabin Luggage',
+    description: 'Compact hard-shell cabin luggage ideal for flights and short trips.',
+    price: 4299,
+    discount: 22,
+    stock: 140,
+    brand: 'American Tourister',
+    images: [img(1008155), img(1152077), img(741209), img(1545743)],
+    rating: 4.4,
+    review_count: 2980,
+    categorySlug: 'travel',
+  },
+
+  // ─── BEAUTY ─────────────────────────────────────────────────────────────────
+  {
+    name: 'Maybelline Matte Lipstick',
+    description: 'Long-lasting matte finish lipstick with rich color payoff.',
+    price: 399,
+    discount: 18,
+    stock: 450,
+    brand: 'Maybelline',
+    images: [img(2533266), img(3373736), img(2113855), img(2693644)],
+    rating: 4.3,
+    review_count: 7740,
+    categorySlug: 'beauty',
+  },
+  {
+    name: 'Lakme Face Serum',
+    description: 'Lightweight hydrating serum for glowing and refreshed skin.',
+    price: 599,
+    discount: 22,
+    stock: 360,
+    brand: 'Lakme',
+    images: [img(3738349), img(6621414), img(4465124), img(3373742)],
+    rating: 4.2,
+    review_count: 4950,
+    categorySlug: 'beauty',
+  },
+  {
+    name: 'Minimalist Sunscreen SPF 50',
+    description: 'Broad spectrum sunscreen with lightweight texture and non-greasy finish.',
+    price: 499,
     discount: 15,
-    stock: 80,
-    brand: 'Yonex',
-    images: [
-      img(3660204), // Badminton racket with shuttlecock on a court surface
-      img(1432034), // Close-up of badminton racket strings and graphite frame
-      img(3998448), // Two badminton rackets crossed over a shuttlecock
-      img(3660203), // Badminton net and racket, indoor court perspective
-    ],
+    stock: 310,
+    brand: 'Minimalist',
+    images: [img(4465124), img(3738349), img(3373742), img(6621414)],
+    rating: 4.4,
+    review_count: 5820,
+    categorySlug: 'beauty',
+  },
+  {
+    name: 'Mamaearth Onion Hair Oil',
+    description: 'Hair care oil enriched for stronger roots and reduced hair fall.',
+    price: 449,
+    discount: 20,
+    stock: 390,
+    brand: 'Mamaearth',
+    images: [img(6621334), img(4465831), img(3737579), img(3373736)],
+    rating: 4.1,
+    review_count: 6655,
+    categorySlug: 'beauty',
+  },
+
+  // ─── TOYS ───────────────────────────────────────────────────────────────────
+  {
+    name: 'Remote Control Racing Car',
+    description: 'Fast RC car with responsive controls and durable body.',
+    price: 1499,
+    discount: 24,
+    stock: 210,
+    brand: 'FunBlast',
+    images: [img(163036), img(35619), img(163037), img(1261820)],
+    rating: 4.2,
+    review_count: 2640,
+    categorySlug: 'toys',
+  },
+  {
+    name: 'Teddy Bear Soft Toy',
+    description: 'Soft plush teddy bear perfect for gifting and kids room decor.',
+    price: 799,
+    discount: 30,
+    stock: 420,
+    brand: 'Hamleys',
+    images: [img(459976), img(236230), img(42230), img(3933025)],
     rating: 4.5,
-    review_count: 2300,
+    review_count: 4810,
+    categorySlug: 'toys',
+  },
+  {
+    name: 'Building Blocks Set',
+    description: 'Creative educational building blocks for imaginative play.',
+    price: 999,
+    discount: 20,
+    stock: 300,
+    brand: 'Lego Style',
+    images: [img(163696), img(3662667), img(3933025), img(1261820)],
+    rating: 4.4,
+    review_count: 3220,
+    categorySlug: 'toys',
+  },
+  {
+    name: 'Kids Kitchen Play Set',
+    description: 'Pretend play kitchen set with accessories for fun role play.',
+    price: 1799,
+    discount: 18,
+    stock: 160,
+    brand: 'Toyshine',
+    images: [img(3662667), img(3933025), img(163696), img(1261820)],
+    rating: 4.1,
+    review_count: 1980,
+    categorySlug: 'toys',
+  },
+
+  // ─── SPORTS ─────────────────────────────────────────────────────────────────
+  {
+    name: 'Yonex Badminton Racket',
+    description: 'Lightweight carbon frame racket for beginners and intermediates.',
+    price: 2499,
+    discount: 15,
+    stock: 180,
+    brand: 'Yonex',
+    images: [img(3660204), img(1432034), img(3998448), img(3660203)],
+    rating: 4.4,
+    review_count: 3400,
     categorySlug: 'sports',
   },
-
   {
     name: 'Decathlon Yoga Mat 6mm',
-    description:
-      'Non-slip surface, carrying strap included, eco-friendly material, 180x60cm',
+    description: 'Non-slip yoga mat with comfortable thickness and carrying strap.',
     price: 999,
     discount: 20,
     stock: 500,
     brand: 'Decathlon',
-    images: [
-      img(3822621), // Purple yoga mat laid flat on studio floor, top view
-      img(3820374), // Rolled-up yoga mat on wooden floor
-      img(1103242), // Yoga mat with water bottle and blocks on wooden floor
-      img(4056541), // Yoga mat detail — non-slip texture surface close-up
-    ],
+    images: [img(3822621), img(3820374), img(1103242), img(4056541)],
     rating: 4.3,
     review_count: 8900,
     categorySlug: 'sports',
   },
-
   {
-    name: 'Nivia Storm Football (Size 5)',
-    description:
-      'FIFA quality pro, 32-panel hand-stitched, butyl bladder, all-weather play',
+    name: 'Nivia Football Size 5',
+    description: 'Durable all-weather football for training and matches.',
     price: 1499,
     discount: 10,
     stock: 400,
     brand: 'Nivia',
-    images: [
-      img(47730),   // Classic black-and-white soccer ball on green grass
-      img(1171084), // Football on green grass pitch, close-up
-      img(3621840), // Soccer ball on football pitch, stadium blurred behind
-      img(274422),  // Football resting on court, bright daylight shot
-    ],
+    images: [img(47730), img(1171084), img(3621840), img(274422)],
     rating: 4.2,
     review_count: 5600,
     categorySlug: 'sports',
   },
-
   {
-    name: 'Boldfit Whey Protein 2kg',
-    description:
-      '24g protein per scoop, 5.5g BCAA, low sugar, lab tested, chocolate flavor',
-    price: 1999,
-    discount: 35,
-    stock: 700,
-    brand: 'Boldfit',
-    images: [
-      img(1552242), // Protein shaker bottle on gym bench with powder tub
-      img(841130),  // Fitness supplement container / protein tub close-up
-      img(3490348), // Chocolate protein powder scoop on dark background
-      img(3766180), // Gym bag, shaker, and supplements flatlay on floor
-    ],
-    rating: 4.1,
-    review_count: 14000,
+    name: 'Dumbbell Set 10kg',
+    description: 'Home workout dumbbell set for strength and fitness training.',
+    price: 1799,
+    discount: 23,
+    stock: 240,
+    brand: 'Adrenex',
+    images: [img(416717), img(949129), img(1552106), img(28080)],
+    rating: 4.2,
+    review_count: 5045,
     categorySlug: 'sports',
+  },
+
+  // ─── BOOKS ──────────────────────────────────────────────────────────────────
+  {
+    name: 'Atomic Habits',
+    description: 'A practical guide to building good habits and breaking bad ones.',
+    price: 499,
+    discount: 40,
+    stock: 2000,
+    brand: 'Penguin',
+    images: [img(1130882), img(904620), img(159711), img(256431)],
+    rating: 4.8,
+    review_count: 45000,
+    categorySlug: 'books',
+  },
+  {
+    name: 'The Psychology of Money',
+    description: 'Timeless lessons on wealth, greed, and happiness.',
+    price: 399,
+    discount: 35,
+    stock: 1500,
+    brand: 'Jaico',
+    images: [img(1148399), img(762687), img(2908175), img(694740)],
+    rating: 4.7,
+    review_count: 31000,
+    categorySlug: 'books',
+  },
+  {
+    name: 'Deep Work',
+    description: 'Focused success in a distracted world by Cal Newport.',
+    price: 449,
+    discount: 30,
+    stock: 800,
+    brand: 'Hachette',
+    images: [img(590493), img(256541), img(1181671), img(2177482)],
+    rating: 4.6,
+    review_count: 18000,
+    categorySlug: 'books',
+  },
+  {
+    name: 'Rich Dad Poor Dad',
+    description: 'Classic personal finance book about assets, income and mindset.',
+    price: 349,
+    discount: 28,
+    stock: 1200,
+    brand: 'Plata Publishing',
+    images: [img(159866), img(1130980), img(904620), img(159711)],
+    rating: 4.6,
+    review_count: 22050,
+    categorySlug: 'books',
   },
 ];
 
@@ -447,7 +822,7 @@ async function seed() {
       });
     }
 
-    console.log('✅ Seed completed successfully');
+    console.log(`✅ Seed completed successfully with ${products.length} products`);
     process.exit(0);
   } catch (err) {
     try {
