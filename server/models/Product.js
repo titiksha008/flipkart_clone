@@ -20,6 +20,13 @@ const Product = sequelize.define('Product', {
   stock: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
+    allowNull: false,
+    validate: {
+      min: {
+        args: [0],
+        msg: 'Stock cannot be negative',
+      },
+    },
   },
   brand: {
     type: DataTypes.STRING,

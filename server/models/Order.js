@@ -19,7 +19,7 @@ const Order = sequelize.define('Order', {
     defaultValue: 'pending',
   },
   payment_method: {
-    type: DataTypes.ENUM('COD', 'UPI', 'CARD'),
+    type: DataTypes.ENUM('COD', 'UPI', 'CARD', 'NET_BANKING'),  // ✅ added NET_BANKING
     defaultValue: 'COD',
   },
   payment_status: {
