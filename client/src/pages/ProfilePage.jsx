@@ -61,9 +61,22 @@ export default function ProfilePage() {
   const [form, setForm] = useState({ name: '', phone: '' });
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState('');
-  const [addresses, setAddresses] = useState([]);
+
+  // ── Addresses: load from localStorage on mount ──────────────────────────
+  const [addresses, setAddresses] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('user_addresses') || '[]');
+    } catch {
+      return [];
+    }
+  });
   const [newAddress, setNewAddress] = useState({ line: '', city: '', pin: '', type: 'Home' });
   const [addingAddr, setAddingAddr] = useState(false);
+
+  // ── Persist addresses to localStorage whenever they change ───────────────
+  useEffect(() => {
+    localStorage.setItem('user_addresses', JSON.stringify(addresses));
+  }, [addresses]);
 
   useEffect(() => { dispatch(fetchMe()); dispatch(fetchWishlist()); }, [dispatch]);
   useEffect(() => { if (user) setForm({ name: user.name || '', phone: user.phone || '' }); }, [user]);
@@ -531,7 +544,7 @@ export default function ProfilePage() {
                       <button
                         onClick={() => {
                           if (newAddress.line.trim()) {
-                            setAddresses([...addresses, newAddress]);
+                            setAddresses((prev) => [...prev, newAddress]);
                             setNewAddress({ line: '', city: '', pin: '', type: 'Home' });
                             setAddingAddr(false);
                           }
@@ -568,7 +581,7 @@ export default function ProfilePage() {
                         <div className="flex gap-3 ml-3 flex-shrink-0">
                           <button className="text-xs text-[#2874f0] font-semibold hover:underline">Edit</button>
                           <button
-                            onClick={() => setAddresses(addresses.filter((_, j) => j !== i))}
+                            onClick={() => setAddresses((prev) => prev.filter((_, j) => j !== i))}
                             className="text-xs text-red-400 hover:text-red-600 font-semibold"
                           >Remove</button>
                         </div>
