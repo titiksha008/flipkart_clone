@@ -1,5 +1,11 @@
 import nodemailer from 'nodemailer';
 
+if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+  console.error(
+    '❌ EMAIL_USER or EMAIL_PASS is missing from environment variables. Emails will not be sent.'
+  );
+}
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -8,15 +14,43 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Verify transporter on startup and log clearly
 transporter.verify((error, success) => {
   if (error) {
-    console.error('Email transporter error:', error);
+    console.error('❌ Email transporter verification failed:');
+    console.error('   Code   :', error.code);
+    console.error('   Message:', error.message);
+    console.error(
+      '   → Make sure EMAIL_USER and EMAIL_PASS are set correctly in your .env file.'
+    );
+    console.error(
+      '   → EMAIL_PASS must be a Gmail App Password (not your normal Gmail password).'
+    );
+    console.error(
+      '   → 2-Step Verification must be ON for the Gmail account.'
+    );
+    console.error(
+      '   → Generate an App Password at: https://myaccount.google.com/apppasswords'
+    );
   } else {
-    console.log('Email server is ready to send messages');
+    console.log(
+      `✅ Email transporter ready. Sending from: ${process.env.EMAIL_USER}`
+    );
   }
 });
 
 export const sendOrderConfirmationEmail = async ({ to, name, order }) => {
+  // Guard: don't attempt send if credentials are missing
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    throw new Error(
+      'Email credentials (EMAIL_USER / EMAIL_PASS) are not configured in environment variables.'
+    );
+  }
+
+  if (!to) {
+    throw new Error('Recipient email address ("to") is required.');
+  }
+
   const itemsHtml = order.orderItems
     .map(
       (item) => `
@@ -75,6 +109,8 @@ export const sendOrderConfirmationEmail = async ({ to, name, order }) => {
     </div>
   `;
 
+  console.log(`📧 Attempting to send order confirmation email to: ${to}`);
+
   const info = await transporter.sendMail({
     from: `"Flipkart Clone" <${process.env.EMAIL_USER}>`,
     to,
@@ -82,6 +118,8 @@ export const sendOrderConfirmationEmail = async ({ to, name, order }) => {
     html,
   });
 
-  console.log('Order email sent successfully:', info.response);
+  console.log('✅ Order confirmation email sent successfully!');
+  console.log('   Message ID:', info.messageId);
+  console.log('   Response :', info.response);
   return info;
 };

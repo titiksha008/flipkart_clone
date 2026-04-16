@@ -172,27 +172,32 @@ export const createOrder = asyncHandler(async (req, res) => {
       },
     ],
   });
-// 9. Send confirmation email
-try {
-  console.log('Order route hit');
-  console.log('User email from DB:', user.email);
-  console.log('About to send order confirmation email...');
 
-  if (user.email) {
-    const info = await sendOrderConfirmationEmail({
-      to: user.email,
-      name: user.name || 'Customer',
-      order: fullOrder,
-    });
+  // 9. Send confirmation email
+  try {
+    console.log('📦 Order placed. Preparing confirmation email...');
+    console.log('   User name :', user.name || 'Customer');
+    console.log('   User email:', user.email || '(none)');
 
-    console.log('Order confirmation email sent successfully');
-    console.log('Mail response:', info);
-  } else {
-    console.warn('User email not found. Skipping order confirmation email.');
+    if (user.email) {
+      await sendOrderConfirmationEmail({
+        to: user.email,
+        name: user.name || 'Customer',
+        order: fullOrder,
+      });
+    } else {
+      console.warn('⚠️  User has no email address set. Skipping confirmation email.');
+    }
+  } catch (emailError) {
+    // Log the full error so you can debug — but don't fail the order response
+    console.error('❌ Failed to send order confirmation email:');
+    console.error('   Error code   :', emailError.code);
+    console.error('   Error message:', emailError.message);
+    if (emailError.response) {
+      console.error('   SMTP response:', emailError.response);
+    }
   }
-} catch (emailError) {
-  console.error('Failed to send order confirmation email:', emailError);
-}
+
   // 10. Return response
   res.status(201).json({
     success: true,
