@@ -25,6 +25,20 @@ export const fetchProductById = createAsyncThunk(
   }
 );
 
+export const fetchRecommendations = createAsyncThunk(
+  'products/fetchRecommendations',
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await api.get(`/products/${id}/recommendations`);
+      return res.data.data; // { similar, alsoBought, fbtCompanions }
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || 'Failed to fetch recommendations'
+      );
+    }
+  }
+);
+
 const productSlice = createSlice({
   name: 'products',
   initialState: {
@@ -33,6 +47,13 @@ const productSlice = createSlice({
     loading: false,
     pagination: {},
     error: null,
+    recommendations: {
+      similar: [],
+      alsoBought: [],
+      fbtCompanions: [],
+    },
+    recommendationsLoading: false,
+    recommendationsError: null,
   },
   reducers: {
     clearSelectedProduct: (state) => {
@@ -67,6 +88,7 @@ const productSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // ── fetchProducts ──────────────────────────────────────────────────────
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -82,6 +104,7 @@ const productSlice = createSlice({
         state.error = action.payload || 'Failed to fetch products';
       })
 
+      // ── fetchProductById ───────────────────────────────────────────────────
       .addCase(fetchProductById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -96,6 +119,26 @@ const productSlice = createSlice({
         state.loading = false;
         state.selectedProduct = null;
         state.error = action.payload || 'Failed to fetch product';
+      })
+
+      // ── fetchRecommendations ───────────────────────────────────────────────
+      .addCase(fetchRecommendations.pending, (state) => {
+        state.recommendationsLoading = true;
+        state.recommendationsError = null;
+        state.recommendations = { similar: [], alsoBought: [], fbtCompanions: [] };
+      })
+      .addCase(fetchRecommendations.fulfilled, (state, action) => {
+        state.recommendationsLoading = false;
+        state.recommendations = {
+          similar: action.payload.similar ?? [],
+          alsoBought: action.payload.alsoBought ?? [],
+          fbtCompanions: action.payload.fbtCompanions ?? [],
+        };
+      })
+      .addCase(fetchRecommendations.rejected, (state, action) => {
+        state.recommendationsLoading = false;
+        state.recommendationsError = action.payload || 'Failed to fetch recommendations';
+        state.recommendations = { similar: [], alsoBought: [], fbtCompanions: [] };
       });
   },
 });

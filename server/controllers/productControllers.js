@@ -20,7 +20,7 @@ export const getProducts = asyncHandler(async (req, res) => {
   const where = {};
 
   if (search) {
-    where.name = { [Op.like]: `%${search}%` }; // ✅ FIXED
+    where.name = { [Op.like]: `%${search}%` };
   }
 
   if (minPrice || maxPrice) {
@@ -84,4 +84,83 @@ export const getProductById = asyncHandler(async (req, res) => {
   }
 
   res.json({ success: true, data: product });
+});
+
+export const getRecommendations = asyncHandler(async (req, res) => {
+  const currentId = parseInt(req.params.id, 10);
+
+  const current = await Product.findByPk(currentId, {
+    include: [
+      {
+        model: Category,
+        as: 'category',
+        attributes: ['id', 'name', 'slug'],
+      },
+    ],
+  });
+
+  if (!current) {
+    throw new AppError('Product not found', 404);
+  }
+
+  const categoryId = current.category_id;
+  const brand = current.brand?.trim().toLowerCase();
+
+  const allOthers = await Product.findAll({
+    where: { id: { [Op.ne]: currentId } },
+    include: [
+      {
+        model: Category,
+        as: 'category',
+        attributes: ['id', 'name', 'slug'],
+      },
+    ],
+    order: [['rating', 'DESC']],
+    limit: 100,
+  });
+
+  const sameCategory = allOthers.filter(
+    (p) => Number(p.category_id) === Number(categoryId)
+  );
+
+  let similar = [...sameCategory].sort(
+    (a, b) => Number(b.rating || 0) - Number(a.rating || 0)
+  );
+
+  if (similar.length < 4) {
+    const usedIds = new Set(similar.map((p) => p.id));
+    const filler = allOthers.filter((p) => !usedIds.has(p.id));
+    similar = [...similar, ...filler];
+  }
+
+  similar = similar.slice(0, 12);
+
+  const sameBrandDiffCat = allOthers.filter((p) => {
+    const pBrand = p.brand?.trim().toLowerCase();
+    return brand && pBrand === brand && Number(p.category_id) !== Number(categoryId);
+  });
+
+  const sameBrandIds = new Set(sameBrandDiffCat.map((p) => p.id));
+  const remainingForAlsoBought = allOthers.filter(
+    (p) => !sameBrandIds.has(p.id)
+  );
+
+  const alsoBought = [...sameBrandDiffCat, ...remainingForAlsoBought]
+    .sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0))
+    .slice(0, 12);
+
+  const fbtPool = similar.length >= 2 ? similar : allOthers;
+
+  const fbtCompanions = [...fbtPool]
+    .sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0))
+    .slice(0, 2);
+
+  res.json({
+    success: true,
+    data: {
+      similar,
+      alsoBought,
+      fbtCompanions,
+    },
+  });
 });
