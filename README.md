@@ -34,7 +34,6 @@ It supports product browsing, cart management, authentication, order placement, 
 - 📄 Product detail page with images and pricing  
 - 🛒 Add to cart, update quantity, remove items  
 - ❤️ Wishlist functionality  
-- 🔐 User authentication (JWT-based login/signup)  
 - 🚚 Checkout and order placement  
 - 📦 Order history page  
 - 📧 Email confirmation after order placement  
@@ -133,12 +132,13 @@ Axios is configured with:
 
 ---
 
-## 🔐 Authentication Flow
+## 🔐 Authentication
 
-* User signs up or logs in
-* Backend returns JWT token
-* Token stored in localStorage
-* Token sent with every request via Authorization header
+- This project uses a **default user setup** for demo purposes  
+- No login or signup is required to use the application  
+- All actions (cart, orders, wishlist) are performed using a predefined user  
+
+> Note: JWT-based authentication can be integrated in future versions.
 
 ---
 
